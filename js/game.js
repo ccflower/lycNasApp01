@@ -1,4 +1,48 @@
 $(function() {
+    var serialNumber;
+	var NebPay
+	var nebPay
+	var nebulas
+	dappContactAddress = "n1iDHz9DCAGZPRsz7qgLBd8Ve7orEP9cT5s";
+	nebulas = require("nebulas"), neb = new nebulas.Neb();
+	neb.setRequest(new nebulas.HttpRequest("https://mainnet.nebulas.io"));
+	
+	NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
+	nebPay = new NebPay();
+	
+	function getAllPlayerInfo(){
+		var from = dappContactAddress;
+        var value = "0";
+        var nonce = "0";
+        var gas_price = "1000000";
+        var gas_limit = "20000000";
+        var callFunction = "getAllPlayerInfo";
+        var callArgs = "";
+        //console.log("callFunction:" + callFunction + " callArgs:" + callArgs);
+        var contract = {
+            "function": callFunction,
+            "args": callArgs
+        };
+        neb.api.call(from, dappContactAddress, value, nonce, gas_price, gas_limit, contract).then(function (resp) {
+            var result = resp.result;   
+        
+            result = JSON.parse(result);
+            console.log(result);
+            var html = "";
+			var itemList = result;
+			console.log(itemList);
+            for(var i = 0, iLen = itemList.length; i < iLen; i++) {
+                html += '<li>' +
+				'<p class="item-content"><font color="white">玩家：'+ itemList[i].from + '<br>分数：' + itemList[i].score + '</font></p>' +
+						'</li>';
+						console.log(html);
+            }
+            $('#itemList').append(html);
+        }).catch(function (err) {
+            console.log("error :" + err.message);
+        })
+	}
+
     // 在html直接写代码，不编译、不构建，不然应该用const的
     var width = 400, height = 600, ballSize = 20;
 
@@ -183,8 +227,26 @@ $(function() {
                                     });
 
                                     if (!canShoot) {
-                                        alert('You lose'+ score);
+                                        // alert('You lose'+ score);
                                         console.log(score);
+                                        bootbox.confirm("您本局得分为:" + score + ", 点击确定可保存至星云链中。", function(result){
+                                            console.log(result); 
+                                            if(result !== null && result !== ""){
+                                                var to = dappContactAddress;
+                                                var value = "0";
+                                                var callFunction = "addScore";
+                                                var callArgs = "[\"" + score + "\"]";
+                                                console.log(callArgs);
+                                                serialNumber = nebPay.call(to, value, callFunction, callArgs, {    //使用nebpay的call接口去调用合约,
+                                                    listener: function (resp) {
+                                                        console.log("thecallback is " + resp)
+                                                        scoreNumber = 0;
+                                                        volleyNum = 2;
+                                                        fruits.length = 0;
+                                                    }
+                                                });
+                                            }   
+                                       });
                                     } else {
                                         startAim();
                                         addBlock(5 + score / 10, true);
