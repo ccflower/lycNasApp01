@@ -3,9 +3,9 @@ $(function() {
 	var NebPay
 	var nebPay
 	var nebulas
-	dappContactAddress = "n1iDHz9DCAGZPRsz7qgLBd8Ve7orEP9cT5s";
+	dappContactAddress = "n1t4s62fbmQncVmWidnZBk6ZKBjfa7XLJZf";
 	nebulas = require("nebulas"), neb = new nebulas.Neb();
-	neb.setRequest(new nebulas.HttpRequest("https://mainnet.nebulas.io"));
+	neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
 	
 	NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
 	nebPay = new NebPay();
@@ -229,13 +229,32 @@ $(function() {
                                     if (!canShoot) {
                                         // alert('You lose'+ score);
                                         console.log(score);
+                                        function getNowFormatDate() {
+                                            var date = new Date();
+                                            var seperator1 = "-";
+                                            var seperator2 = ":";
+                                            var month = date.getMonth() + 1;
+                                            var strDate = date.getDate();
+                                            if (month >= 1 && month <= 9) {
+                                                month = "0" + month;
+                                            }
+                                            if (strDate >= 0 && strDate <= 9) {
+                                                strDate = "0" + strDate;
+                                            }
+                                            var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+                                                    + " " + date.getHours() + seperator2 + date.getMinutes()
+                                                    + seperator2 + date.getSeconds();
+                                            return currentdate;
+                                        }
+                                        var playTime = getNowFormatDate();
+                                        console.log(playTime);
                                         bootbox.confirm("您本局得分为:" + score + ", 点击确定可保存至星云链中。", function(result){
                                             console.log(result); 
                                             if(result !== null && result !== ""){
                                                 var to = dappContactAddress;
                                                 var value = "0";
                                                 var callFunction = "addScore";
-                                                var callArgs = "[\"" + score + "\"]";
+                                                var callArgs = "[\"" + score + "\",\"" + playTime + "\"]";
                                                 console.log(callArgs);
                                                 serialNumber = nebPay.call(to, value, callFunction, callArgs, {    //使用nebpay的call接口去调用合约,
                                                     listener: function (resp) {
