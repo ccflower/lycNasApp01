@@ -31,13 +31,16 @@ $(function() {
             var html = "";
 			var itemList = result;
 			console.log(itemList);
-            // for(var i = 0, iLen = itemList.length; i < iLen; i++) {
-            //     html += '<li>' +
-			// 	'<p class="item-content"><font color="white">玩家：'+ itemList[i].from + '<br>分数：' + itemList[i].score + '</font></p>' +
-			// 			'</li>';
-			// 			console.log(html);
-            // }
-            // $('#itemList').append(html);
+            for(var i = 0, iLen = itemList.length; i < iLen; i++) {
+                html += '<tr>' +
+                        '<th scope="row">'+ (i+1) +'</th>' +
+                        '<td>'+itemList[i].from+'</td>' +
+                        '<td>'+itemList[i].score+'</td>' +
+                        '<td>'+itemList[i].date+'</td>' +
+                        '</tr>';
+						console.log(html);
+            }
+            $('#itemList').append(html);
         }).catch(function (err) {
             console.log("error :" + err.message);
         })
